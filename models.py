@@ -1,4 +1,5 @@
-from app import db  # Import from app, not extensions
+# models.py
+from extensions import db
 from datetime import datetime
 
 class User(db.Model):
@@ -28,7 +29,8 @@ class User(db.Model):
             'phone_number': self.phone_number,
             'location': self.location,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'items_count': len(self.items) if self.items else 0
+            'items_count': len(self.items) if self.items else 0,
+            'outgoing_requests_count': len([r for r in self.outgoing_requests]) if self.outgoing_requests else 0
         }
 
 
@@ -110,7 +112,7 @@ class Request(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected, completed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

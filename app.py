@@ -1,38 +1,35 @@
+# app.py
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_cors import CORS
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from extensions import db, migrate, cors, bcrypt, jwt
 from config import Config
-
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
-cors = CORS()
-bcrypt = Bcrypt()
-jwt = JWTManager()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    # Initialize extensions
+    # Initialize extensions with app
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
     
-    # Import models
-    from models import User, Category, Item, Request
-    
+    # Import models here to avoid circular imports
+    with app.app_context():
+        from models import User, Category, Item, Request
+        
     # Register blueprints
     from routes.auth_routes import auth_bp
     from routes.category_routes import category_bp
+    from routes.item_routes import item_bp
+    from routes.request_routes import request_bp
+    from routes.dashboard_routes import dashboard_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(category_bp)
+    app.register_blueprint(item_bp)
+    app.register_blueprint(request_bp)
+    app.register_blueprint(dashboard_bp)
     
     # Test route
     @app.route('/')
@@ -43,17 +40,21 @@ def create_app(config_class=Config):
             'version': '1.0',
             'endpoints': {
                 'auth': '/api/auth/register, /api/auth/login, /api/auth/profile',
-                'categories': '/api/categories/'
+                'dashboard': '/api/dashboard/stats, /api/dashboard/activity',
+                'categories': '/api/categories/',
+                'items': '/api/items/ (GET, POST), /api/items/<id> (GET, PUT, DELETE)',
+                'requests': '/api/requests/incoming, /api/requests/outgoing, /api/requests/item/<id>'
             }
         })
     
     @app.route('/health')
     def health_check():
         try:
+            # Simple query to test database
             db.session.execute('SELECT 1')
             db_status = 'connected'
         except Exception as e:
-            db_status = 'error'
+            db_status = f'error: {str(e)}'
         
         return jsonify({
             'api': 'running',
@@ -63,6 +64,7 @@ def create_app(config_class=Config):
     
     return app
 
+# For running directly
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True, port=5555)

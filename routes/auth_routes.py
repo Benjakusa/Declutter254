@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db, bcrypt  # Import from app
+from extensions import db, bcrypt
 from models import User
 from utils.validators import validate_kenyan_phone, validate_required_fields
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -11,13 +11,6 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 def register():
     """
     Register a new user
-    Expected JSON:
-    {
-        "phone_number": "0712345678",
-        "password": "securepassword",
-        "name": "John Doe",
-        "location": "Roysambu, near Tuskys"
-    }
     """
     try:
         data = request.get_json()
@@ -52,13 +45,13 @@ def register():
             phone_number=phone,
             password_hash=hashed_password,
             name=data['name'],
-            location=data.get('location', '')  # Optional
+            location=data.get('location', '')
         )
         
         db.session.add(new_user)
         db.session.commit()
         
-        # Create access token
+        # Create access token - ensure identity is a string
         access_token = create_access_token(
             identity=str(new_user.id),
             expires_delta=timedelta(hours=24)
@@ -79,11 +72,6 @@ def register():
 def login():
     """
     Login user
-    Expected JSON:
-    {
-        "phone_number": "0712345678",
-        "password": "securepassword"
-    }
     """
     try:
         data = request.get_json()
@@ -111,7 +99,7 @@ def login():
                 'error': 'Invalid phone number or password'
             }), 401
         
-        # Create access token
+        # Create access token - ensure identity is a string
         access_token = create_access_token(
             identity=str(user.id),
             expires_delta=timedelta(hours=24)
@@ -135,7 +123,7 @@ def get_profile():
     """
     try:
         user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        user = User.query.get(int(user_id))  # Convert to int for query
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
@@ -154,7 +142,7 @@ def update_profile():
     """
     try:
         user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        user = User.query.get(int(user_id))
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
