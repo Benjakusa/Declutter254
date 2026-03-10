@@ -1,4 +1,4 @@
-# models.py
+# models.py - CLEAN MVP VERSION
 from extensions import db
 from datetime import datetime
 
@@ -12,12 +12,14 @@ class User(db.Model):
     location = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
+    # Relationships 
     items = db.relationship('Item', back_populates='giver', cascade='all, delete-orphan')
     outgoing_requests = db.relationship('Request', 
                                        foreign_keys='Request.seeker_id', 
                                        back_populates='seeker',
                                        cascade='all, delete-orphan')
+    
+
     
     def __repr__(self):
         return f'<User: {self.name} ({self.phone_number})>'
@@ -29,8 +31,8 @@ class User(db.Model):
             'phone_number': self.phone_number,
             'location': self.location,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'items_count': len(self.items) if self.items else 0,
-            'outgoing_requests_count': len([r for r in self.outgoing_requests]) if self.outgoing_requests else 0
+            'items_count': len(self.items) if self.items else 0
+           
         }
 
 
@@ -43,6 +45,8 @@ class Category(db.Model):
     
     # Relationships
     items = db.relationship('Item', back_populates='category')
+    
+    
     
     def __repr__(self):
         return f'<Category: {self.name}>'
@@ -83,6 +87,7 @@ class Item(db.Model):
                               back_populates='item',
                               cascade='all, delete-orphan')
     
+    
     def __repr__(self):
         return f'<Item: {self.title}>'
     
@@ -111,10 +116,9 @@ class Request(db.Model):
     __tablename__ = 'requests'
     
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected, completed
+    message = db.Column(db.Text, nullable=False)  # USER-SUBMITTABLE ATTRIBUTE
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Foreign Keys
     seeker_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -124,12 +128,15 @@ class Request(db.Model):
     seeker = db.relationship('User', foreign_keys=[seeker_id], back_populates='outgoing_requests')
     item = db.relationship('Item', foreign_keys=[item_id], back_populates='requests')
     
+   
+    
     @property
     def giver(self):
         return self.item.giver if self.item else None
     
     @property
     def giver_phone(self):
+        """Only reveal phone if request is approved"""
         if self.status == 'approved' and self.item and self.item.giver:
             return self.item.giver.phone_number
         return None
@@ -143,7 +150,6 @@ class Request(db.Model):
             'message': self.message,
             'status': self.status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'seeker_id': self.seeker_id,
             'seeker_name': self.seeker.name if self.seeker else None,
             'item_id': self.item_id,
@@ -151,3 +157,4 @@ class Request(db.Model):
             'giver_name': self.giver.name if self.giver else None,
             'giver_phone': self.giver_phone
         }
+
