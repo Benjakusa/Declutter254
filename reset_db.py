@@ -11,7 +11,7 @@ def reset_database():
         db.drop_all()
         db.create_all()
         
-        print("🗑️  Database dropped and recreated")
+        print("  Database dropped and recreated")
         
         categories = [
             Category(name="Furniture", description="Sofas, tables, beds, chairs"),
@@ -23,7 +23,7 @@ def reset_database():
         
         db.session.add_all(categories)
         db.session.commit()
-        print(f"✅ Created {len(categories)} categories")
+        print(f" Created {len(categories)} categories")
         
         users = [
             User(
@@ -48,7 +48,7 @@ def reset_database():
         
         db.session.add_all(users)
         db.session.commit()
-        print(f"✅ Created {len(users)} users")
+        print(f" Created {len(users)} users")
         
         items = [
             Item(
@@ -94,7 +94,7 @@ def reset_database():
         
         db.session.add_all(items)
         db.session.commit()
-        print(f"✅ Created {len(items)} items")
+        print(f" Created {len(items)} items")
         
         requests = [
             Request(
@@ -119,21 +119,21 @@ def reset_database():
         
         db.session.add_all(requests)
         db.session.commit()
-        print(f"✅ Created {len(requests)} requests")
+        print(f" Created {len(requests)} requests")
         
         print("\n" + "="*50)
-        print("🎉 DATABASE RESET WITH MVP DATA")
+        print(" DATABASE RESET WITH MVP DATA")
         print("="*50)
-        print("\n📊 SUMMARY:")
+        print("\n SUMMARY:")
         print(f"   Users: {User.query.count()}")
         print(f"   Categories: {Category.query.count()}")
         print(f"   Items: {Item.query.count()}")
         print(f"   Requests: {Request.query.count()}")
         print("="*50)
         
-        print("\n🔑 TEST ACCOUNTS:")
+        print("\n TEST ACCOUNTS:")
         for user in users:
-            print(f"   📱 {user.phone_number} (Password: password123) - {user.name}")
+            print(f"    {user.phone_number} (Password: password123) - {user.name}")
 
 if __name__ == "__main__":
     reset_database()
