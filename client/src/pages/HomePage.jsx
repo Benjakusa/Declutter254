@@ -6,25 +6,24 @@ import ItemCard from "../components/ItemCard"
 
 function HomePage(){
 
-  const [items, setItems] = useState([])
-  const [filteredItems, setFilteredItems] = useState([])
+  const [items,setItems] = useState([])
+  const [filteredItems,setFilteredItems] = useState([])
 
-  useEffect(() => {
+  useEffect(()=>{
 
-    fetchItems().then(data => {
+    fetchItems().then(data=>{
       setItems(data)
       setFilteredItems(data)
     })
 
-  }, [])
-
+  },[])
 
   function handleFilter(filters){
 
     let result = items
 
     if(filters.category){
-      result = result.filter(item => item.category === filters.category)
+      result = result.filter(item=>item.category === filters.category)
     }
 
     if(filters.location){
@@ -56,9 +55,9 @@ function HomePage(){
 
   return(
 
-    <div>
+    <div style={{padding:"30px"}}>
 
-      <h1>Available Items</h1>
+      <h1 style={{marginBottom:"20px"}}>Available Items</h1>
 
       <SearchBar onSearch={handleSearch} />
 
@@ -66,15 +65,17 @@ function HomePage(){
 
       <div
         style={{
-          display:"flex",
-          flexWrap:"wrap",
-          gap:"15px",
-          marginTop:"20px"
+          display:"grid",
+          gridTemplateColumns:"repeat(auto-fill, minmax(230px,1fr))",
+          gap:"20px",
+          marginTop:"30px"
         }}
       >
 
         {filteredItems.map(item => (
+
           <ItemCard key={item.id} item={item}/>
+
         ))}
 
       </div>
