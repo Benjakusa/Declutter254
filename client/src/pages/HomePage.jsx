@@ -18,12 +18,13 @@ function HomePage(){
 
   },[])
 
+
   function handleFilter(filters){
 
     let result = items
 
     if(filters.category){
-      result = result.filter(item=>item.category === filters.category)
+      result = result.filter(item => item.category === filters.category)
     }
 
     if(filters.location){
@@ -63,22 +64,42 @@ function HomePage(){
 
       <FilterBar onFilter={handleFilter} />
 
-      <div
-        style={{
-          display:"grid",
-          gridTemplateColumns:"repeat(auto-fill, minmax(230px,1fr))",
-          gap:"20px",
-          marginTop:"30px"
-        }}
-      >
+      {filteredItems.length === 0 ? (
 
-        {filteredItems.map(item => (
+        <div
+          style={{
+            marginTop:"40px",
+            textAlign:"center",
+            color:"#666"
+          }}
+        >
 
-          <ItemCard key={item.id} item={item}/>
+          <h2>No items available yet</h2>
 
-        ))}
+          <p>Be the first to post something!</p>
 
-      </div>
+        </div>
+
+      ) : (
+
+        <div
+          style={{
+            display:"grid",
+            gridTemplateColumns:"repeat(auto-fill, minmax(230px,1fr))",
+            gap:"20px",
+            marginTop:"30px"
+          }}
+        >
+
+          {filteredItems.map(item => (
+
+            <ItemCard key={item.id} item={item}/>
+
+          ))}
+
+        </div>
+
+      )}
 
     </div>
 
