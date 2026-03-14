@@ -8,12 +8,14 @@ function HomePage(){
 
   const [items,setItems] = useState([])
   const [filteredItems,setFilteredItems] = useState([])
+  const [loading,setLoading] = useState(true)
 
   useEffect(()=>{
 
     fetchItems().then(data=>{
       setItems(data)
       setFilteredItems(data)
+      setLoading(false)
     })
 
   },[])
@@ -54,6 +56,21 @@ function HomePage(){
   }
 
 
+  if(loading){
+
+    return(
+
+      <div style={{padding:"30px", textAlign:"center"}}>
+
+        <h2>Loading items...</h2>
+
+      </div>
+
+    )
+
+  }
+
+
   return(
 
     <div style={{padding:"30px"}}>
@@ -75,7 +92,6 @@ function HomePage(){
         >
 
           <h2>No items available yet</h2>
-
           <p>Be the first to post something!</p>
 
         </div>
