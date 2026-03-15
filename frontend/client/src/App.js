@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
 
 import Navbar from "./components/Navbar";
 
@@ -12,30 +14,36 @@ import PostItemForm from "./components/PostItemForm";
 
 function App() {
   return (
-    <Router>
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/item/:id" element={<ItemDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-      <Navbar />
+          <Route path="/post-item" element={
+            <PrivateRoute>
+              <PostItemForm />
+            </PrivateRoute>
+          } />
 
-      <Routes>
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          } />
 
-        <Route path="/" element={<HomePage />} />
-
-        <Route path="/item/:id" element={<ItemDetail />} />
-
-        <Route path="/post-item" element={<PostItemForm />} />
-
-        <Route path="/profile" element={<Profile />} />
-
-        <Route path="/requests" element={<RequestsPage />} />
-
-        <Route path="/login" element={<Login />} />
-
-        <Route path="/signup" element={<Signup />} />
-
-      </Routes>
-
-    </Router>
+          <Route path="/requests" element={
+            <PrivateRoute>
+              <RequestsPage />
+            </PrivateRoute>
+          } />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
-export default App; 
+export default App;
